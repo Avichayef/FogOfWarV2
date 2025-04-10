@@ -24,23 +24,28 @@ class _MapScreenState extends State<MapScreen> {
   bool _isLoading = true;
   LocationData? _initialPosition;
   List<Polygon> _fogPolygons = [];
+  bool _offlineModeChecked = false;
 
   @override
   void initState() {
     super.initState();
-
-    // Initialize map first
     _initializeMap();
+  }
 
-    // Then check offline mode after build is complete
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Only check offline mode once to avoid setState during build
+    if (!_offlineModeChecked) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       if (authProvider.isOfflineMode) {
         // Set fog of war provider to offline mode
         final fogProvider = Provider.of<FogOfWarProvider>(context, listen: false);
         fogProvider.setOfflineMode(true);
       }
-    });
+      _offlineModeChecked = true;
+    }
   }
 
   Future<void> _initializeMap() async {

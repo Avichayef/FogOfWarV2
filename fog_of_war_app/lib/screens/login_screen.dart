@@ -61,15 +61,21 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize auth provider once
-    Future.delayed(Duration.zero, () {
-      if (!_isAuthInitialized) {
-        Provider.of<AuthProvider>(context, listen: false).initialize();
-        setState(() {
-          _isAuthInitialized = true;
-        });
-      }
-    });
+    _initializeAuth();
+  }
+
+  Future<void> _initializeAuth() async {
+    if (!_isAuthInitialized) {
+      // Set flag first to prevent multiple initializations
+      _isAuthInitialized = true;
+
+      // Use a microtask to avoid calling setState during build
+      await Future.microtask(() {
+        if (mounted) {
+          Provider.of<AuthProvider>(context, listen: false).initialize();
+        }
+      });
+    }
   }
 
   @override
