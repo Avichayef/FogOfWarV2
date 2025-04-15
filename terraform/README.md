@@ -38,21 +38,26 @@ cp terraform.tfvars.example terraform.tfvars
 
 Edit `terraform.tfvars` to set your AWS key pair name and any other customizations.
 
-### 3. Plan the Deployment
+### 3. Deploy with Automatic Cleanup
+
+We've created scripts to simplify deployment and ensure resources are cleaned up to avoid charges:
 
 ```bash
-terraform plan
+# Deploy and automatically destroy after 8 hours
+./deploy.sh --timeout 8
+
+# Deploy with automatic cleanup on failure
+./deploy.sh --auto-destroy
+
+# Deploy without automatic cleanup
+./deploy.sh
 ```
 
-Review the plan to ensure it will create the expected resources.
-
-### 4. Apply the Configuration
-
-```bash
-terraform apply
-```
-
-Type `yes` when prompted to confirm the deployment.
+The deployment script will:
+1. Initialize Terraform
+2. Plan and apply the configuration
+3. Output the server details
+4. Set up automatic destruction if requested
 
 ### 5. Access the Server
 
@@ -77,13 +82,17 @@ final String baseUrl = 'http://[SERVER_PUBLIC_IP]:3000/api';
 
 ## Cleanup
 
-To destroy all resources when you're done testing:
+To destroy all resources when you're done testing, use the auto_destroy script:
 
 ```bash
-terraform destroy
+# Destroy immediately
+./auto_destroy.sh --destroy
+
+# Set up timed destruction (e.g., after 4 hours)
+./auto_destroy.sh --timeout 4
 ```
 
-Type `yes` when prompted to confirm.
+This ensures you won't incur unexpected AWS charges.
 
 ## Cost Estimation
 
